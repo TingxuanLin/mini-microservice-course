@@ -3,7 +3,7 @@ name: Build and Push Posts Service
 on:
   pull_request:
     paths:
-      - 'posts/**'
+      - 'blog/posts/**'
   workflow_dispatch: {}
 
 jobs:

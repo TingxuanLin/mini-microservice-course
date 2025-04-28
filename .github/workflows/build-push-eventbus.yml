@@ -3,7 +3,7 @@ name: Build and Push Event-Bus Service
 on:
   pull_request:
     paths:
-      - 'event-bus/**'
+      - 'blog/event-bus/**'
   workflow_dispatch: {}
 
 jobs:

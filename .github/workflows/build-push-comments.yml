@@ -3,7 +3,7 @@ name: Build and Push Comments Service
 on:
   pull_request:
     paths:
-      - 'comments/**'
+      - 'blog/comments/**'
   workflow_dispatch: {}
 
 jobs:

@@ -3,7 +3,7 @@ name: Build and Push Query Service
 on:
   pull_request:
     paths:
-      - 'query/**'
+      - 'blog/query/**'
   workflow_dispatch: {}
 
 jobs:

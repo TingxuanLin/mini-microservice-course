@@ -3,7 +3,7 @@ name: Build and Push Client Service
 on:
   pull_request:
     paths:
-      - 'client/**'
+      - 'blog/client/**'
   workflow_dispatch: {}
 
 jobs:

@@ -1,0 +1,31 @@
+name: Build and Push Query Service
+
+on:
+  pull_request:
+    paths:
+      - 'query/**'
+  workflow_dispatch: {}
+
+jobs:
+  build-push-query:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Timestamp
+        id: vars
+        run: echo "timestamp=$(date -u +%Y%m%d-%H%M)" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.ECR_QUERY_URI }} ./query
+          docker tag ${{ secrets.ECR_QUERY_URI }}:latest ${{ secrets.ECR_QUERY_URI }}:${{ env.timestamp }}
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.ECR_QUERY_URI }}:${{ env.timestamp }}

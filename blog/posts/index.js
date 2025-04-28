@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const posts = {};
+const EVENT_BUS_URL = process.env.EVENT_BUS_URL || "http://localhost:4005";
 
 app.get("/posts", (req, res) => {
   res.send(posts);
@@ -24,7 +25,7 @@ app.post("/posts", async (req, res) => {
     title,
   };
 
-  await axios.post("http://localhost:4005/events", {
+  await axios.post(`${EVENT_BUS_URL}/events`, {
     type: "PostCreated",
     data: {
       id,

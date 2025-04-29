@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: event-bus
-          image: ${{ secrets.ECR_EVENT_BUS_URI }}:latest
+          image: ${{ secrets.ECR_EVENTBUS_URI }}:latest
           ports:
             - containerPort: 4005

@@ -9,6 +9,10 @@ on:
 jobs:
   build-push-query:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
       - name: Checkout Code
@@ -23,7 +27,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.ECR_QUERY_URI }} ./query
+          docker build -t ${{ secrets.ECR_QUERY_URI }} ./blog/query
           docker tag ${{ secrets.ECR_QUERY_URI }}:latest ${{ secrets.ECR_QUERY_URI }}:${{ env.timestamp }}
 
       - name: Push Docker Image

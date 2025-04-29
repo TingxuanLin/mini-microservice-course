@@ -1,0 +1,38 @@
+name: Trigger All Service Builds
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  trigger-builds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Posts Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-posts.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Comments Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-comments.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger EventBus Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-eventbus.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Query Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-query.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Client Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-client.yml
+          token: ${{ secrets.GITHUB_TOKEN }}

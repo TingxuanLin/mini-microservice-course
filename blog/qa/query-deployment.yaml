@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: query-deployment
+  namespace: qa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: query
+  template:
+    metadata:
+      labels:
+        app: query
+    spec:
+      containers:
+        - name: query
+          image: ${{ secrets.ECR_QUERY_URI }}:latest
+          ports:
+            - containerPort: 4002

@@ -18,3 +18,10 @@ spec:
           image: ${{ secrets.ECR_EVENTBUS_URI }}:latest
           ports:
             - containerPort: 4005
+          env:
+            - name: POSTS_URL
+              value: "http://posts-service:4000"
+            - name: COMMENTS_URL
+              value: "http://comments-service:4001"
+            - name: QUERY_URL
+              value: "http://query-service:4002"

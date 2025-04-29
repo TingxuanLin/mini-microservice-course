@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.ECR_CLIENT_URI }} ./client
+          docker build -t ${{ secrets.ECR_CLIENT_URI }} ./blog/client
           docker tag ${{ secrets.ECR_CLIENT_URI }}:latest ${{ secrets.ECR_CLIENT_URI }}:${{ env.timestamp }}
 
       - name: Push Docker Image

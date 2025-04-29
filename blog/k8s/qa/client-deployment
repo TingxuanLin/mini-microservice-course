@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: client
-          image: ${{ secrets.ECR_CLIENT_URI }}:latest
+          image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/client:latest
           ports:
             - containerPort: 80

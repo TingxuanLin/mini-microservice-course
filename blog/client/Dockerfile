@@ -1,27 +1,25 @@
-# 1st stage: build the React app
-FROM node:16 AS builder
+FROM node:18-alpine as builder
 
 WORKDIR /app
-
-COPY package*.json ./
+COPY package.json ./
 RUN npm install
+COPY . ./
 
-COPY . .
+# Build-time env vars for React
+ARG REACT_APP_COMMENTS_SERVICE_URL
+ARG REACT_APP_QUERY_SERVICE_URL
+ARG REACT_APP_POSTS_SERVICE_URL
+ARG REACT_APP_EVENTBUS_SERVICE_URL
+
+ENV REACT_APP_COMMENTS_SERVICE_URL=$REACT_APP_COMMENTS_SERVICE_URL
+ENV REACT_APP_QUERY_SERVICE_URL=$REACT_APP_QUERY_SERVICE_URL
+ENV REACT_APP_POSTS_SERVICE_URL=$REACT_APP_POSTS_SERVICE_URL
+ENV REACT_APP_EVENTBUS_SERVICE_URL=$REACT_APP_EVENTBUS_SERVICE_URL
+
 RUN npm run build
 
-# 2nd stage: serve with nginx
 FROM nginx:stable-alpine
-
-# Remove the default nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy built React files
 COPY --from=builder /app/build /usr/share/nginx/html
-
-# Copy custom nginx config if needed (optional)
-# COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
+

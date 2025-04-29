@@ -9,6 +9,8 @@ on:
 jobs:
   build-push-client:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       - name: Checkout Code

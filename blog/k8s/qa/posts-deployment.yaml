@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: posts
-          image: ${{ secrets.ECR_POSTS_URI }}:latest
+          image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/posts:latest
           ports:
             - containerPort: 4000
           env:

@@ -1,0 +1,74 @@
+name: Deploy to QA
+
+on:
+  workflow_dispatch: {}  # Manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ secrets.EKS_CLUSTER_NAME }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Apply all Kubernetes manifests to QA namespace
+        run: |
+          kubectl apply -n qa -f k8s/qa/posts-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/posts-service.yaml
+          kubectl apply -n qa -f k8s/qa/comments-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/comments-service.yaml
+          kubectl apply -n qa -f k8s/qa/event-bus-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/event-bus-service.yaml
+          kubectl apply -n qa -f k8s/qa/query-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/query-service.yaml
+          kubectl apply -n qa -f k8s/qa/client-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/client-service.yaml
+          kubectl apply -n qa -f k8s/qa/ingress.yaml
+
+      - name: Wait for Pods to become Ready
+        run: |
+          kubectl rollout status deployment/posts-deployment -n qa
+          kubectl rollout status deployment/comments-deployment -n qa
+          kubectl rollout status deployment/event-bus-deployment -n qa
+          kubectl rollout status deployment/query-deployment -n qa
+          kubectl rollout status deployment/client-deployment -n qa
+
+      - name: Print QA Pod, Service, and Ingress Status
+        run: |
+          echo "🐳 Pods in QA namespace:"
+          kubectl get pods -n qa
+          echo "📡 Services in QA namespace:"
+          kubectl get svc -n qa
+          echo "🌐 Ingress in QA namespace:"
+          kubectl get ingress -n qa
+
+      - name: Test Ingress URL
+        run: |
+          INGRESS_URL=$(kubectl get ingress app-ingress -n qa -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+          echo "🔗 Testing Ingress at: http://$INGRESS_URL"
+
+          for i in {1..10}; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$INGRESS_URL)
+            echo "Attempt $i → HTTP $HTTP_STATUS"
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✅ App is reachable via Ingress!"
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "❌ Ingress endpoint not reachable after 10 attempts"
+          exit 1

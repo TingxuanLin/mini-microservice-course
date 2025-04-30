@@ -1,4 +1,4 @@
-name: Build and Push Client Service
+name: Build and Push Client Service (QA)
 
 on:
   pull_request:
@@ -21,15 +21,22 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set up Timestamp
+      - name: Set Image Tag
         id: vars
-        run: echo "timestamp=$(date -u +%Y%m%d-%H%M)" >> $GITHUB_ENV
+        run: echo "tag=qa-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Build Docker Image
+      - name: Load .env.qa and Build Image
+        working-directory: blog/client
         run: |
-          docker build -t ${{ secrets.ECR_CLIENT_URI }} ./blog/client
-          docker tag ${{ secrets.ECR_CLIENT_URI }}:latest ${{ secrets.ECR_CLIENT_URI }}:${{ env.timestamp }}
+          export $(cat .env.qa | xargs)
+          docker build \
+            --build-arg REACT_APP_COMMENTS_SERVICE_URL=$REACT_APP_COMMENTS_SERVICE_URL \
+            --build-arg REACT_APP_QUERY_SERVICE_URL=$REACT_APP_QUERY_SERVICE_URL \
+            --build-arg REACT_APP_POSTS_SERVICE_URL=$REACT_APP_POSTS_SERVICE_URL \
+            --build-arg REACT_APP_EVENTBUS_SERVICE_URL=$REACT_APP_EVENTBUS_SERVICE_URL \
+            -t ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }} .
 
-      - name: Push Docker Image
+      - name: Push QA Image to ECR
         run: |
-          docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.timestamp }}
+          docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }}
+

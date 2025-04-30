@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
@@ -37,7 +37,7 @@ jobs:
         run: echo "${{ env.tag }}" > client-qa.tag
 
       - name: Upload Tag Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: client-qa-tag
           path: client-qa.tag

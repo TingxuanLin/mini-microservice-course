@@ -1,15 +1,38 @@
-name: Deploy to QA
+name: Full QA Deploy (Build Client, Push, Deploy All)
 
 on:
-  workflow_dispatch: {}  # Manual trigger from GitHub UI
+  workflow_dispatch: {}  # Manual trigger
 
 jobs:
-  deploy:
+  qa-deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
-      - name: Checkout source code
+      - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set Tag for QA Image
+        id: vars
+        run: echo "tag=qa-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Build and Push Client Image for QA
+        working-directory: blog/client
+        run: |
+          export $(cat .env.qa | xargs)
+          docker build \
+            --build-arg REACT_APP_COMMENTS_SERVICE_URL=$REACT_APP_COMMENTS_SERVICE_URL \
+            --build-arg REACT_APP_QUERY_SERVICE_URL=$REACT_APP_QUERY_SERVICE_URL \
+            --build-arg REACT_APP_POSTS_SERVICE_URL=$REACT_APP_POSTS_SERVICE_URL \
+            --build-arg REACT_APP_EVENTBUS_SERVICE_URL=$REACT_APP_EVENTBUS_SERVICE_URL \
+            -t ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }} .
+          docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -34,11 +57,16 @@ jobs:
           kubectl apply -n qa -f k8s/qa/event-bus-service.yaml
           kubectl apply -n qa -f k8s/qa/query-deployment.yaml
           kubectl apply -n qa -f k8s/qa/query-service.yaml
-          kubectl apply -n qa -f k8s/qa/client-deployment.yaml
           kubectl apply -n qa -f k8s/qa/client-service.yaml
           kubectl apply -n qa -f k8s/qa/ingress.yaml
 
-      - name: Wait for Pods to become Ready
+      - name: Patch client deployment image
+        run: |
+          kubectl set image deployment/client-deployment \
+            client=${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }} \
+            -n qa
+
+      - name: Wait for all Pods to become Ready
         run: |
           kubectl rollout status deployment/posts-deployment -n qa
           kubectl rollout status deployment/comments-deployment -n qa
@@ -48,11 +76,8 @@ jobs:
 
       - name: Print QA Pod, Service, and Ingress Status
         run: |
-          echo "🐳 Pods in QA namespace:"
           kubectl get pods -n qa
-          echo "📡 Services in QA namespace:"
           kubectl get svc -n qa
-          echo "🌐 Ingress in QA namespace:"
           kubectl get ingress -n qa
 
       - name: Test Ingress URL
@@ -64,11 +89,11 @@ jobs:
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://$INGRESS_URL)
             echo "Attempt $i → HTTP $HTTP_STATUS"
             if [ "$HTTP_STATUS" = "200" ]; then
-              echo "✅ App is reachable via Ingress!"
+              echo "✅ App is reachable!"
               exit 0
             fi
             sleep 10
           done
 
-          echo "❌ Ingress endpoint not reachable after 10 attempts"
+          echo "❌ Ingress failed after 10 attempts."
           exit 1

@@ -1,13 +1,10 @@
-name: Build and Push Client Service (QA)
+name: Build Client for QA
 
 on:
-  pull_request:
-    paths:
-      - 'blog/client/**'
   workflow_dispatch: {}
 
 jobs:
-  build-push-client:
+  build-client:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -22,10 +19,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set Image Tag
-        id: vars
         run: echo "tag=qa-${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Load .env.qa and Build Image
+      - name: Build and Push Client Image
         working-directory: blog/client
         run: |
           export $(cat .env.qa | xargs)
@@ -35,8 +31,15 @@ jobs:
             --build-arg REACT_APP_POSTS_SERVICE_URL=$REACT_APP_POSTS_SERVICE_URL \
             --build-arg REACT_APP_EVENTBUS_SERVICE_URL=$REACT_APP_EVENTBUS_SERVICE_URL \
             -t ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }} .
-
-      - name: Push QA Image to ECR
-        run: |
           docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }}
+
+      - name: Save Tag as Artifact
+        run: echo "${{ env.tag }}" > client-qa.tag
+
+      - name: Upload Tag Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client-qa-tag
+          path: client-qa.tag
+
 

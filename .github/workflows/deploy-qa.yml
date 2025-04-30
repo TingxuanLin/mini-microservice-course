@@ -30,7 +30,9 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
-            --region ${{ secrets.AWS_REGION }}
+            --region ${{ secrets.AWS_REGION }} \
+            --role-arn ${{ secrets.EKS_ROLE_ARN }}
+
 
       - name: Deploy client with provided image tag
         run: |

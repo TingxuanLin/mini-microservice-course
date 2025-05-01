@@ -28,6 +28,13 @@ jobs:
           aws eks update-kubeconfig \
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
             --region ${{ secrets.AWS_REGION }}
+      
+      - name: Create or update client-env-config ConfigMap
+        run: |
+          kubectl delete configmap client-env-config -n qa --ignore-not-found
+          kubectl create configmap client-env-config \
+            --from-file=env-config.js=blog/k8s/qa/env-config.js \
+            -n qa
 
       - name: Apply all Kubernetes manifests to QA namespace
         run: |

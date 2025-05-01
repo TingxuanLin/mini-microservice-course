@@ -1,25 +1,22 @@
-name: Deploy Client to QA
+name: Deploy All Services to QA
 
 on:
-  workflow_dispatch:
-    inputs:
-      image_tag:
-        description: 'Image tag to deploy (e.g. qa-03b90f4)'
-        required: true
+  workflow_dispatch: {}
 
 jobs:
-  deploy-client:
+  deploy-all:
     runs-on: ubuntu-latest
+
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
-      - name: Checkout Code
+      - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -30,20 +27,38 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
-            --region ${{ secrets.AWS_REGION }} \
-            # --role-arn ${{ secrets.EKS_ROLE_ARN }}
+            --region ${{ secrets.AWS_REGION }}
 
-
-      - name: Deploy client with provided image tag
+      - name: Apply all Kubernetes manifests to QA namespace
         run: |
-          echo "Deploying tag: ${{ github.event.inputs.image_tag }}"
-          kubectl set image deployment/client-deployment \
-            client=${{ secrets.ECR_CLIENT_URI }}:${{ github.event.inputs.image_tag }} \
-            -n qa
+          kubectl apply -n qa -f k8s/qa/posts-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/posts-service.yaml
+          kubectl apply -n qa -f k8s/qa/comments-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/comments-service.yaml
+          kubectl apply -n qa -f k8s/qa/event-bus-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/event-bus-service.yaml
+          kubectl apply -n qa -f k8s/qa/query-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/query-service.yaml
+          kubectl apply -n qa -f k8s/qa/client-deployment.yaml
+          kubectl apply -n qa -f k8s/qa/client-service.yaml
+          kubectl apply -n qa -f k8s/qa/ingress.yaml
 
-      - name: Verify Deployment + Test Ingress
+      - name: Wait for pods to become ready
         run: |
+          kubectl rollout status deployment/posts-deployment -n qa
+          kubectl rollout status deployment/comments-deployment -n qa
+          kubectl rollout status deployment/event-bus-deployment -n qa
+          kubectl rollout status deployment/query-deployment -n qa
           kubectl rollout status deployment/client-deployment -n qa
+
+      - name: Print service + ingress info
+        run: |
+          kubectl get svc -n qa
+          kubectl get ingress -n qa
+
+      - name: Test Ingress
+        run: |
           INGRESS=$(kubectl get ingress app-ingress -n qa -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-          echo "Testing: http://$INGRESS"
+          echo "🔗 Testing: http://$INGRESS"
           curl -I --retry 10 --retry-delay 5 http://$INGRESS
+

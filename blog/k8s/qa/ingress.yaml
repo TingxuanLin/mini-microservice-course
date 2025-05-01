@@ -15,34 +15,34 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: posts-service
+                name: posts-svc
                 port:
                   number: 4000
           - path: /comments
             pathType: Prefix
             backend:
               service:
-                name: comments-service
+                name: comments-svc
                 port:
                   number: 4001
           - path: /query
             pathType: Prefix
             backend:
               service:
-                name: query-service
+                name: query-svc
                 port:
                   number: 4002
           - path: /event-bus
             pathType: Prefix
             backend:
               service:
-                name: event-bus-service
+                name: event-bus-svc
                 port:
                   number: 4005
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: client-service
+                name: client-svc
                 port:
                   number: 80

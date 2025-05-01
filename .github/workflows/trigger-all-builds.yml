@@ -30,3 +30,9 @@ jobs:
         with:
           workflow: build-push-query.yml
           token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Trigger Client Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-push-client.yml
+          token: ${{ secrets.GITHUB_TOKEN }}

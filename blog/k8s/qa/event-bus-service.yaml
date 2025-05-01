@@ -5,7 +5,7 @@ metadata:
   namespace: qa
 spec:
   selector:
-    app: posts
+    app: event-bus
   ports:
     - protocol: TCP
       port: 4005

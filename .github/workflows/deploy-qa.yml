@@ -31,17 +31,17 @@ jobs:
 
       - name: Apply all Kubernetes manifests to QA namespace
         run: |
-          kubectl apply -n qa -f k8s/qa/posts-deployment.yaml
-          kubectl apply -n qa -f k8s/qa/posts-service.yaml
-          kubectl apply -n qa -f k8s/qa/comments-deployment.yaml
-          kubectl apply -n qa -f k8s/qa/comments-service.yaml
-          kubectl apply -n qa -f k8s/qa/event-bus-deployment.yaml
-          kubectl apply -n qa -f k8s/qa/event-bus-service.yaml
-          kubectl apply -n qa -f k8s/qa/query-deployment.yaml
-          kubectl apply -n qa -f k8s/qa/query-service.yaml
-          kubectl apply -n qa -f k8s/qa/client-deployment.yaml
-          kubectl apply -n qa -f k8s/qa/client-service.yaml
-          kubectl apply -n qa -f k8s/qa/ingress.yaml
+          kubectl apply -n qa -f blog/k8s/qa/posts-deployment.yaml
+          kubectl apply -n qa -f blog/k8s/qa/posts-service.yaml
+          kubectl apply -n qa -f blog/k8s/qa/comments-deployment.yaml
+          kubectl apply -n qa -f blog/k8s/qa/comments-service.yaml
+          kubectl apply -n qa -f blog/k8s/qa/event-bus-deployment.yaml
+          kubectl apply -n qa -f blog/k8s/qa/event-bus-service.yaml
+          kubectl apply -n qa -f blog/k8s/qa/query-deployment.yaml
+          kubectl apply -n qa -f blog/k8s/qa/query-service.yaml
+          kubectl apply -n qa -f blog/k8s/qa/client-deployment.yaml
+          kubectl apply -n qa -f blog/k8s/qa/client-service.yaml
+          kubectl apply -n qa -f blog/k8s/qa/ingress.yaml
 
       - name: Wait for pods to become ready
         run: |

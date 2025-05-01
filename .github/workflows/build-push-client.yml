@@ -33,7 +33,7 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.ECR_CLIENT_URI }}:latest
-          docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.tag }}
+          docker push ${{ secrets.ECR_CLIENT_URI }}:${{ env.timestamp }}
 
 
 

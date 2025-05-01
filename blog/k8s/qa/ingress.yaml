@@ -43,6 +43,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: client-svc
+                name: client-service
                 port:
                   number: 80

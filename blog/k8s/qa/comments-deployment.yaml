@@ -20,4 +20,4 @@ spec:
             - containerPort: 4001
           env:
             - name: EVENT_BUS_URL
-              value: "http://event-bus-svc.qa.svc.cluster.local"
+              value: "http://event-bus-svc.qa.svc.cluster.local:4005"

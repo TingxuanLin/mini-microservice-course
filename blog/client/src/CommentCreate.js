@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const commentsUrl = window.REACT_APP_COMMENTS_SERVICE_URL;
+
 export default ({ postId }) => {
   const [content, setContent] = useState("");
 
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    await axios.post(`/comments/posts/${postId}/comments`, {
+    await axios.post(`${commentsUrl}/posts/${postId}/comments`, {
       content,
     });
 

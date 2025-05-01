@@ -4,7 +4,7 @@ import axios from "axios";
 import CommentCreate from "./CommentCreate";
 import CommentList from "./CommentList";
 
-const queryURL = process.env.REACT_APP_QUERY_SERVICE_URL;
+const queryURL = window.REACT_APP_QUERY_SERVICE_URL;
 export default () => {
   const [posts, setPosts] = useState({});
   const fetchPosts = async () => {

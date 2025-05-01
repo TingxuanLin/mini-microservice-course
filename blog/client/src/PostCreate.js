@@ -9,7 +9,7 @@ export default () => {
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    await axios.post(`${postsURL}/posts`, {
+    await axios.post(`/posts`, {
       title,
     });
 

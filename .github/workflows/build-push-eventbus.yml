@@ -33,3 +33,4 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.ECR_EVENTBUS_URI }}:${{ env.timestamp }}
+          docker push ${{ secrets.ECR_EVENTBUS_URI }}:latest

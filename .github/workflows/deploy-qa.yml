@@ -58,7 +58,19 @@ jobs:
 
       - name: Test Ingress
         run: |
-          INGRESS=$(kubectl get ingress app-ingress -n qa -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-          echo "🔗 Testing: http://$INGRESS"
-          curl -I --retry 10 --retry-delay 5 http://$INGRESS
+          echo "⏳ Waiting for ingress to get hostname..."
+      
+          for i in {1..12}; do
+            INGRESS=$(kubectl get ingress app-ingress -n qa -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+            if [[ "$INGRESS" != "" ]]; then
+              echo "✅ Ingress available at: http://$INGRESS"
+              curl -I --retry 5 --retry-delay 5 http://$INGRESS
+              exit 0
+            fi
+            echo "Attempt $i → No ingress yet. Retrying in 10s..."
+            sleep 10
+          done
+      
+          echo "❌ Ingress did not get hostname in time."
+          exit 1
 

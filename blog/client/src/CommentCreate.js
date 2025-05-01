@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const commentsURL = process.env.REACT_APP_COMMENTS_SERVICE_URL;
+const commentsURL = window.REACT_APP_COMMENTS_SERVICE_URL;
 
 export default ({ postId }) => {
   const [content, setContent] = useState("");

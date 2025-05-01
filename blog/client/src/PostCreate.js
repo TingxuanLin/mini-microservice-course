@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const postURL = window.REACT_APP_POSTS_SERVICE_URL;
+
 export default () => {
   const [title, setTitle] = useState("");
 
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    await axios.post(`/posts/posts`, {
+    await axios.post(`${postURL}/posts`, {
       title,
     });
 

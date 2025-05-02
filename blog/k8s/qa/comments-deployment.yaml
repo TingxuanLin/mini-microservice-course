@@ -16,6 +16,7 @@ spec:
       containers:
         - name: comments
           image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/comments:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4001
           env:

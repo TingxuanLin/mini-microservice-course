@@ -7,6 +7,9 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/strip-prefix: "false"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
   rules:
     - http:
@@ -32,13 +35,6 @@ spec:
                 name: query-svc
                 port:
                   number: 4002
-          - path: /event-bus
-            pathType: Prefix
-            backend:
-              service:
-                name: event-bus-svc
-                port:
-                  number: 4005
           - path: /
             pathType: Prefix
             backend:
@@ -46,3 +42,4 @@ spec:
                 name: client-service
                 port:
                   number: 80
+

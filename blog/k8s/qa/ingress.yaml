@@ -12,25 +12,26 @@ spec:
   rules:
     - http:
         paths:
-          - path: /posts(/|$)(.*)
-            pathType: Prefix
+          - path: ^/posts(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: posts-svc
                 port:
                   number: 4000
-          - path: /comments(/|$)(.*)
-            pathType: Prefix
+          
+          - path: ^/comments(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: comments-svc
                 port:
                   number: 4001
-          - path: /query(/|$)(.*)
-            pathType: Prefix
+          
+          - path: ^/query(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: query-svc
                 port:
                   number: 4002
-

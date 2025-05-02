@@ -12,7 +12,7 @@ app.use(cors());
 const posts = {};
 const EVENT_BUS_URL = process.env.EVENT_BUS_URL || "http://localhost:4005";
 
-app.get("/posts/posts", (req, res) => {
+app.get("/posts", (req, res) => {
   console.log(`from posts service: ${posts}`);
   res.send(posts);
 });
@@ -36,7 +36,7 @@ app.post("/posts/posts", async (req, res) => {
   res.status(201).send(posts[id]);
 });
 
-app.post("/posts/events", (req, res) => {
+app.post("/events", (req, res) => {
   console.log("Received event", req.body.type);
 
   res.send({});

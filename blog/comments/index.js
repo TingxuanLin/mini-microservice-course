@@ -12,11 +12,11 @@ app.use(cors());
 const commentsByPostId = {};
 const EVENT_BUS_URL = process.env.EVENT_BUS_URL || "http://localhost:4005";
 
-app.get("/posts/:id/comments", (req, res) => {
+app.get("/comments/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
 });
 
-app.post("/posts/:id/comments", async (req, res) => {
+app.post("/comments/posts/:id/comments", async (req, res) => {
   const commentId = randomBytes(4).toString("hex");
   const { content } = req.body;
 
@@ -38,7 +38,7 @@ app.post("/posts/:id/comments", async (req, res) => {
   res.status(201).send(comments);
 });
 
-app.post("/events", (req, res) => {
+app.post("/comments/events", (req, res) => {
   console.log("Received Event", req.body.type);
 
   res.send({});

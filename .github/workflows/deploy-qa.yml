@@ -50,6 +50,15 @@ jobs:
           kubectl apply -n qa -f blog/k8s/qa/client-service.yaml
           kubectl apply -n qa -f blog/k8s/qa/ingress.yaml
 
+      - name: Force redeploy all deployments to pull new images
+        run: |
+          kubectl rollout restart deployment/posts-deployment -n qa
+          kubectl rollout restart deployment/comments-deployment -n qa
+          kubectl rollout restart deployment/event-bus-deployment -n qa
+          kubectl rollout restart deployment/query-deployment -n qa
+          kubectl rollout restart deployment/client-deployment -n qa
+
+
       - name: Wait for pods to become ready
         run: |
           kubectl rollout status deployment/posts-deployment -n qa

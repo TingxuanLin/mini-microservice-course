@@ -12,7 +12,7 @@ app.use(cors());
 const commentsByPostId = {};
 const EVENT_BUS_URL = process.env.EVENT_BUS_URL || "http://localhost:4005";
 
-app.get("/comments/posts/:id/comments", (req, res) => {
+app.get("/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
 });
 

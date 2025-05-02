@@ -13,6 +13,7 @@ const posts = {};
 const EVENT_BUS_URL = process.env.EVENT_BUS_URL || "http://localhost:4005";
 
 app.get("/posts", (req, res) => {
+  console.log(`from posts service: ${posts}`);
   res.send(posts);
 });
 

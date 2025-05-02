@@ -6,6 +6,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
     - http:
@@ -31,12 +32,10 @@ spec:
                 name: query-svc
                 port:
                   number: 4002
-          - path: /(.*)
+          - path: /?(.*)
             pathType: Prefix
             backend:
               service:
                 name: client-service
                 port:
                   number: 80
-
-

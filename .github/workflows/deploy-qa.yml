@@ -49,6 +49,7 @@ jobs:
           kubectl apply -n qa -f blog/k8s/qa/client-deployment.yaml
           kubectl apply -n qa -f blog/k8s/qa/client-service.yaml
           kubectl apply -n qa -f blog/k8s/qa/ingress.yaml
+          kubectl apply -f app-client-ingress.yaml -n qa
 
       - name: Force redeploy all deployments to pull new images
         run: |

@@ -16,5 +16,6 @@ spec:
       containers:
         - name: query
           image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/query:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4002

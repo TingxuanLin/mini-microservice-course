@@ -10,7 +10,7 @@ export default () => {
   const [posts, setPosts] = useState({});
   const fetchPosts = async () => {
     const res = await axios.get(`${queryURL}/posts`);
-    console.log(res.data);
+    console.log(`data is : ${res.data}`);
     setPosts(res.data);
   };
 

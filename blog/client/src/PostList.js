@@ -16,7 +16,7 @@ export default () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [posts]);
+  }, []);
 
   const renderedPosts = posts && Object.keys(posts).length > 0
     ? Object.values(posts).map((post) => (

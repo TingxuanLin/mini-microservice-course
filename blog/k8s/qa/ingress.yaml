@@ -33,10 +33,11 @@ spec:
                 name: query-svc
                 port:
                   number: 4002
-          - path: /?(.*)
-            pathType: Prefix
+          - path: /()(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: client-service
                 port:
                   number: 80
+

@@ -16,6 +16,7 @@ spec:
       containers:
         - name: event-bus
           image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/event-bus:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4005
           env:

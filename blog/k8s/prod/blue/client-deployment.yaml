@@ -31,4 +31,4 @@ spec:
       volumes:
         - name: env-config
           configMap:
-            name: client-env-config-blue
+            name: client-env-config

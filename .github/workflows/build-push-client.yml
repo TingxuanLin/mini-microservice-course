@@ -40,3 +40,4 @@ jobs:
         with:
           workflow: Deploy All Services to QA
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}

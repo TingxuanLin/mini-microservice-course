@@ -5,18 +5,18 @@ metadata:
   namespace: uat
   labels:
     app: posts
-    color: green
+    color: blue
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: posts
-      color: green
+      color: blue
   template:
     metadata:
       labels:
         app: posts
-        color: green
+        color: blue
     spec:
       containers:
         - name: posts

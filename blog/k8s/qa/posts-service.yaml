@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     app: posts
+    color: green
   ports:
     - protocol: TCP
       port: 4000

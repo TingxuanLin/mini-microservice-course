@@ -3,15 +3,21 @@ kind: Deployment
 metadata:
   name: event-bus-deployment
   namespace: qa
+  labels:
+    app: event-bus
+    color: green
+    
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: event-bus
+      color: green
   template:
     metadata:
       labels:
         app: event-bus
+        color: green
     spec:
       containers:
         - name: event-bus

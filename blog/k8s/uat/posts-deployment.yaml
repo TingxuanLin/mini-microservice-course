@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-deployment
+  namespace: uat
+  labels:
+    app: posts
+    color: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts
+      color: green
+  template:
+    metadata:
+      labels:
+        app: posts
+        color: green
+    spec:
+      containers:
+        - name: posts
+          image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/posts:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+          env:
+            - name: EVENT_BUS_URL
+              value: "http://event-bus-svc.uat.svc.cluster.local:4005"

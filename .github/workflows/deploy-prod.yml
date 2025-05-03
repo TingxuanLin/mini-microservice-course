@@ -7,9 +7,6 @@ on:
         description: "Color to deploy (blue or green)"
         required: true
         default: "blue"
-      image_tag:
-        description: "Docker image tag to deploy"
-        required: true
 
 jobs:
   deploy-to-prod:

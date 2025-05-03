@@ -1,4 +1,4 @@
-name: Deploy All Services to QA
+name: Deploy All Services to UAT
 
 on:
   workflow_dispatch: {}
@@ -36,7 +36,7 @@ jobs:
             --from-file=env-config.js=blog/k8s/uat/env-config.js \
             -n uat
 
-      - name: Apply all Kubernetes manifests to QA namespace
+      - name: Apply all Kubernetes manifests to UAT namespace
         run: |
           kubectl apply -n uat -f blog/k8s/uat/posts-deployment.yaml
           kubectl apply -n uat -f blog/k8s/uat/posts-service.yaml

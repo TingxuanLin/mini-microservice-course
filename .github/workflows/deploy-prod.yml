@@ -49,6 +49,12 @@ jobs:
         run: |
           kubectl apply -n prod -f blog/k8s/prod/$COLOR/
 
+      - name: Force rollout to pull latest image
+        run: |
+          for d in posts comments event-bus query client; do
+            kubectl rollout restart deployment/${d}-deployment-${COLOR} -n prod
+          done
+
       - name: Wait for deployments to roll out
         run: |
           for d in posts comments event-bus query client; do

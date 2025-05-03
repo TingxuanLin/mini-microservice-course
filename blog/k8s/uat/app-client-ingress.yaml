@@ -9,7 +9,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: uat.myapp.local
+      http:
         paths:
           - path: /static(/|$)(.*)
             pathType: Prefix

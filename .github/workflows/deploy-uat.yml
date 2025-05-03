@@ -28,7 +28,7 @@ jobs:
           aws eks update-kubeconfig \
             --name ${{ secrets.EKS_CLUSTER_NAME }} \
             --region ${{ secrets.AWS_REGION }}
-      
+
       - name: Create or update client-env-config ConfigMap
         run: |
           kubectl delete configmap client-env-config -n uat --ignore-not-found
@@ -36,37 +36,21 @@ jobs:
             --from-file=env-config.js=blog/k8s/uat/env-config.js \
             -n uat
 
-      - name: Apply all Kubernetes manifests to UAT namespace
+      - name: Apply all manifests to UAT
         run: |
-          kubectl apply -n uat -f blog/k8s/uat/posts-deployment.yaml
-          kubectl apply -n uat -f blog/k8s/uat/posts-service.yaml
-          kubectl apply -n uat -f blog/k8s/uat/comments-deployment.yaml
-          kubectl apply -n uat -f blog/k8s/uat/comments-service.yaml
-          kubectl apply -n uat -f blog/k8s/uat/event-bus-deployment.yaml
-          kubectl apply -n uat -f blog/k8s/uat/event-bus-service.yaml
-          kubectl apply -n uat -f blog/k8s/uat/query-deployment.yaml
-          kubectl apply -n uat -f blog/k8s/uat/query-service.yaml
-          kubectl apply -n uat -f blog/k8s/uat/client-deployment.yaml
-          kubectl apply -n uat -f blog/k8s/uat/client-service.yaml
-          kubectl apply -n uat -f blog/k8s/uat/ingress.yaml
-          kubectl apply -n uat -f blog/k8s/uat/app-client-ingress.yaml 
+          kubectl apply -n uat -f blog/k8s/uat/
 
-      - name: Force redeploy all deployments to pull new images
+      - name: Restart all deployments
         run: |
-          kubectl rollout restart deployment/posts-deployment -n uat
-          kubectl rollout restart deployment/comments-deployment -n uat
-          kubectl rollout restart deployment/event-bus-deployment -n uat
-          kubectl rollout restart deployment/query-deployment -n uat
-          kubectl rollout restart deployment/client-deployment -n uat
+          for d in $(kubectl get deploy -n uat -o jsonpath="{.items[*].metadata.name}"); do
+            kubectl rollout restart deployment/$d -n uat
+          done
 
-
-      - name: Wait for pods to become ready
+      - name: Wait for all deployments to complete
         run: |
-          kubectl rollout status deployment/posts-deployment -n uat
-          kubectl rollout status deployment/comments-deployment -n uat
-          kubectl rollout status deployment/event-bus-deployment -n uat
-          kubectl rollout status deployment/query-deployment -n uat
-          kubectl rollout status deployment/client-deployment -n uat
+          for d in $(kubectl get deploy -n uat -o jsonpath="{.items[*].metadata.name}"); do
+            kubectl rollout status deployment/$d -n uat
+          done
 
       - name: Print service + ingress info
         run: |
@@ -76,7 +60,6 @@ jobs:
       - name: Test Ingress
         run: |
           echo "⏳ Waiting for ingress to get hostname..."
-      
           for i in {1..12}; do
             INGRESS=$(kubectl get ingress app-ingress -n uat -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
             if [[ "$INGRESS" != "" ]]; then
@@ -87,6 +70,5 @@ jobs:
             echo "Attempt $i → No ingress yet. Retrying in 10s..."
             sleep 10
           done
-      
           echo "❌ Ingress did not get hostname in time."
           exit 1

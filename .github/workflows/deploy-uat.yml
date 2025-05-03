@@ -1,0 +1,92 @@
+name: Deploy All Services to QA
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy-all:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ secrets.EKS_CLUSTER_NAME }} \
+            --region ${{ secrets.AWS_REGION }}
+      
+      - name: Create or update client-env-config ConfigMap
+        run: |
+          kubectl delete configmap client-env-config -n uat --ignore-not-found
+          kubectl create configmap client-env-config \
+            --from-file=env-config.js=blog/k8s/uat/env-config.js \
+            -n uat
+
+      - name: Apply all Kubernetes manifests to QA namespace
+        run: |
+          kubectl apply -n uat -f blog/k8s/uat/posts-deployment.yaml
+          kubectl apply -n uat -f blog/k8s/uat/posts-service.yaml
+          kubectl apply -n uat -f blog/k8s/uat/comments-deployment.yaml
+          kubectl apply -n uat -f blog/k8s/uat/comments-service.yaml
+          kubectl apply -n uat -f blog/k8s/uat/event-bus-deployment.yaml
+          kubectl apply -n uat -f blog/k8s/uat/event-bus-service.yaml
+          kubectl apply -n uat -f blog/k8s/uat/query-deployment.yaml
+          kubectl apply -n uat -f blog/k8s/uat/query-service.yaml
+          kubectl apply -n uat -f blog/k8s/uat/client-deployment.yaml
+          kubectl apply -n uat -f blog/k8s/uat/client-service.yaml
+          kubectl apply -n uat -f blog/k8s/uat/ingress.yaml
+          kubectl apply -n uat -f blog/k8s/uat/app-client-ingress.yaml 
+
+      - name: Force redeploy all deployments to pull new images
+        run: |
+          kubectl rollout restart deployment/posts-deployment -n uat
+          kubectl rollout restart deployment/comments-deployment -n uat
+          kubectl rollout restart deployment/event-bus-deployment -n uat
+          kubectl rollout restart deployment/query-deployment -n uat
+          kubectl rollout restart deployment/client-deployment -n uat
+
+
+      - name: Wait for pods to become ready
+        run: |
+          kubectl rollout status deployment/posts-deployment -n uat
+          kubectl rollout status deployment/comments-deployment -n uat
+          kubectl rollout status deployment/event-bus-deployment -n uat
+          kubectl rollout status deployment/query-deployment -n uat
+          kubectl rollout status deployment/client-deployment -n uat
+
+      - name: Print service + ingress info
+        run: |
+          kubectl get svc -n uat
+          kubectl get ingress -n uat
+
+      - name: Test Ingress
+        run: |
+          echo "⏳ Waiting for ingress to get hostname..."
+      
+          for i in {1..12}; do
+            INGRESS=$(kubectl get ingress app-ingress -n uat -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+            if [[ "$INGRESS" != "" ]]; then
+              echo "✅ Ingress available at: http://$INGRESS"
+              curl -I --retry 5 --retry-delay 5 http://$INGRESS
+              exit 0
+            fi
+            echo "Attempt $i → No ingress yet. Retrying in 10s..."
+            sleep 10
+          done
+      
+          echo "❌ Ingress did not get hostname in time."
+          exit 1

@@ -3,15 +3,20 @@ kind: Deployment
 metadata:
   name: comments-deployment
   namespace: qa
+  labels:
+    app: comments
+    color: green
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: comments
+      color: green
   template:
     metadata:
       labels:
         app: comments
+        color: green
     spec:
       containers:
         - name: comments

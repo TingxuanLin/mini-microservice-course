@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comments-deployment
+  namespace: uat
+  labels:
+    app: comments
+    color: blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comments
+      color: blue
+  template:
+    metadata:
+      labels:
+        app: comments
+        color: blue
+    spec:
+      containers:
+        - name: comments
+          image: 293337163121.dkr.ecr.us-east-1.amazonaws.com/comments:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4001
+          env:
+            - name: EVENT_BUS_URL
+              value: "http://event-bus-svc.uat.svc.cluster.local:4005"

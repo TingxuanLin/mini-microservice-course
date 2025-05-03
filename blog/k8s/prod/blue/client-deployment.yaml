@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client-deployment
-  namespace: qa
+  name: client-deployment-blue
+  namespace: prod
   labels:
     app: client
-
+    color: blue
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: client
-
+      color: blue
   template:
     metadata:
       labels:
         app: client
-
+        color: blue
     spec:
       containers:
         - name: client
@@ -31,4 +31,4 @@ spec:
       volumes:
         - name: env-config
           configMap:
-            name: client-env-config
+            name: client-env-config-blue

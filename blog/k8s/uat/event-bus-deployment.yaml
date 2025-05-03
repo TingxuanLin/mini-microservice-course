@@ -5,19 +5,18 @@ metadata:
   namespace: uat
   labels:
     app: event-bus
-    color: blue
-    
+
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: event-bus
-      color: blue
+
   template:
     metadata:
       labels:
         app: event-bus
-        color: blue
+
     spec:
       containers:
         - name: event-bus

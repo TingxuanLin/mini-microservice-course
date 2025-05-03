@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: comments
-    color: green
+
   ports:
     - protocol: TCP
       port: 4001

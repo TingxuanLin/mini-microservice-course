@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: query
-    color: blue
+
   ports:
     - protocol: TCP
       port: 4002

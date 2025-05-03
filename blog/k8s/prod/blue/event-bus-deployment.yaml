@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: event-bus-deployment
-  namespace: qa
+  name: event-bus-deployment-blue
+  namespace: prod
   labels:
     app: event-bus
+    color: blue
 
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: event-bus
-
+      color: blue
   template:
     metadata:
       labels:
         app: event-bus
-
+        color: blue
     spec:
       containers:
         - name: event-bus
@@ -26,8 +27,8 @@ spec:
             - containerPort: 4005
           env:
             - name: POSTS_URL
-              value: "http://posts-svc.qa.svc.cluster.local:4000"
+              value: "http://posts-svc.prod.svc.cluster.local:4000"
             - name: COMMENTS_URL
-              value: "http://comments-svc.qa.svc.cluster.local:4001"
+              value: "http://comments-svc.prod.svc.cluster.local:4001"
             - name: QUERY_URL
-              value: "http://query-svc.qa.svc.cluster.local:4002"
+              value: "http://query-svc.prod.svc.cluster.local:4002"

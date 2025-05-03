@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: posts-deployment
-  namespace: uat
+  name: posts-deployment-blue
+  namespace: prod
   labels:
     app: posts
-
+    color: blue
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: posts
-
+      color: blue
   template:
     metadata:
       labels:
         app: posts
-
+        color: blue
     spec:
       containers:
         - name: posts
@@ -26,4 +26,4 @@ spec:
             - containerPort: 4000
           env:
             - name: EVENT_BUS_URL
-              value: "http://event-bus-svc.uat.svc.cluster.local:4005"
+              value: "http://event-bus-svc.prod.svc.cluster.local:4005"

@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: query-deployment
-  namespace: uat
+  name: query-deployment-blue
+  namespace: prod
   labels:
     app: query
-
+    color: blue
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: query
-
+      color: blue
   template:
     metadata:
       labels:
         app: query
-
+        color: blue
     spec:
       containers:
         - name: query

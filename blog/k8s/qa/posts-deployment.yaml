@@ -5,18 +5,18 @@ metadata:
   namespace: qa
   labels:
     app: posts
-    color: green
+
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: posts
-      color: green
+
   template:
     metadata:
       labels:
         app: posts
-        color: green
+
     spec:
       containers:
         - name: posts

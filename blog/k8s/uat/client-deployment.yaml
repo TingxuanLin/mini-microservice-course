@@ -5,18 +5,18 @@ metadata:
   namespace: uat
   labels:
     app: client
-    color: blue 
+
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: client
-      color: blue
+
   template:
     metadata:
       labels:
         app: client
-        color: blue
+
     spec:
       containers:
         - name: client

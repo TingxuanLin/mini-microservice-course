@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: event-bus
-    color: blue
+
   ports:
     - protocol: TCP
       port: 4005

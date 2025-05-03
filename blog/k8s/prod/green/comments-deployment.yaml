@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: comments-deployment
-  namespace: qa
+  name: comments-deployment-green
+  namespace: prod
   labels:
     app: comments
-
+    color: green
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: comments
-
+      color: green
   template:
     metadata:
       labels:
         app: comments
-
+        color: green
     spec:
       containers:
         - name: comments
@@ -26,4 +26,4 @@ spec:
             - containerPort: 4001
           env:
             - name: EVENT_BUS_URL
-              value: "http://event-bus-svc.qa.svc.cluster.local:4005"
+              value: "http://event-bus-svc.prod.svc.cluster.local:4005"

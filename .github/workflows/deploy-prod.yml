@@ -1,0 +1,74 @@
+name: Deploy All Services to Prod (Blue/Green)
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_color:
+        description: "Color to deploy (blue or green)"
+        required: true
+        default: "blue"
+      image_tag:
+        description: "Docker image tag to deploy"
+        required: true
+
+jobs:
+  deploy-to-prod:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      COLOR: ${{ github.event.inputs.deploy_color }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ secrets.EKS_CLUSTER_NAME }} \
+            --region ${{ secrets.AWS_REGION }}
+
+      - name: Create or update client-env-config ConfigMap
+        run: |
+          kubectl delete configmap client-env-config -n prod --ignore-not-found
+          kubectl create configmap client-env-config \
+            --from-file=env-config.js=blog/k8s/prod/$COLOR/env-config.js \
+            -n prod
+
+      - name: Apply all manifests for ${{ github.event.inputs.deploy_color }}
+        run: |
+          kubectl apply -n prod -f blog/k8s/prod/$COLOR/
+
+      - name: Wait for deployments to roll out
+        run: |
+          for d in posts comments event-bus query client; do
+            kubectl rollout status deployment/${d}-deployment-${COLOR} -n prod
+          done
+
+      - name: Switch traffic to ${{ github.event.inputs.deploy_color }}
+        run: |
+          kubectl patch svc client-service -n prod \
+            -p '{"spec": {"selector": {"app": "client", "color": "${{ github.event.inputs.deploy_color }}"}}}'
+
+      - name: Cleanup opposite deployment (optional)
+        run: |
+          if [ "${{ github.event.inputs.deploy_color }}" == "blue" ]; then
+            kubectl delete deployment client-deployment-green -n prod --ignore-not-found
+          else
+            kubectl delete deployment client-deployment-blue -n prod --ignore-not-found
+          fi
+
+      - name: Print service and ingress info
+        run: |
+          kubectl get svc -n prod
+          kubectl get ingress -n prod

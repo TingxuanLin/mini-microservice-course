@@ -27,8 +27,8 @@ spec:
             - containerPort: 4005
           env:
             - name: POSTS_URL
-              value: "http://posts-svc.prod.svc.cluster.local:4000"
+              value: "http://posts-svc-green.prod.svc.cluster.local:4000"
             - name: COMMENTS_URL
-              value: "http://comments-svc.prod.svc.cluster.local:4001"
+              value: "http://comments-svc-green.prod.svc.cluster.local:4001"
             - name: QUERY_URL
-              value: "http://query-svc.prod.svc.cluster.local:4002"
+              value: "http://query-svc.prod-green.svc.cluster.local:4002"

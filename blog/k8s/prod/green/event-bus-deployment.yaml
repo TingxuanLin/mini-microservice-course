@@ -31,4 +31,4 @@ spec:
             - name: COMMENTS_URL
               value: "http://comments-svc-green.prod.svc.cluster.local:4001"
             - name: QUERY_URL
-              value: "http://query-svc.prod-green.svc.cluster.local:4002"
+              value: "http://query-svc-green.prod.svc.cluster.local:4002"

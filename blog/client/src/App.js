@@ -6,7 +6,7 @@ import PostList from "./PostList";
 export default () => {
   return (
     <div className="container">
-      <h1>Version 2.1</h1>
+      <h1>Version 3.0</h1>
       <h1>Create Post</h1>
       <PostCreate />
       <hr />

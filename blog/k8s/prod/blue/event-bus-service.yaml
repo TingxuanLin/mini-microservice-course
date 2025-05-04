@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: event-bus-svc
+  name: event-bus-svc-blue
   namespace: prod
 spec:
   selector:

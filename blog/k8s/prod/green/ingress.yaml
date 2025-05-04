@@ -17,20 +17,20 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: posts-svc
+                name: posts-svc-green
                 port:
                   number: 4000
           - path: /comments(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: comments-svc
+                name: comments-svc-green
                 port:
                   number: 4001
           - path: /query(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: query-svc
+                name: query-svc-green
                 port:
                   number: 4002

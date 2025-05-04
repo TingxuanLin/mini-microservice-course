@@ -63,8 +63,7 @@ jobs:
           kubectl patch ingress app-ingress -n prod --type='json' -p="[
             {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/0/backend/service/name\", \"value\": \"posts-svc-${{ env.COLOR }}\" },
             {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/1/backend/service/name\", \"value\": \"comments-svc-${{ env.COLOR }}\" },
-            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/2/backend/service/name\", \"value\": \"query-svc-${{ env.COLOR }}\" },
-            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/3/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" }
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/2/backend/service/name\", \"value\": \"query-svc-${{ env.COLOR }}\" }
           ]"
           kubectl patch ingress client-ingress -n prod --type='json' -p="[
             {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/0/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" },

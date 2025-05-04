@@ -58,18 +58,28 @@ jobs:
             kubectl rollout status deployment/${d}-deployment-${COLOR} -n prod
           done
 
-      - name: Switch traffic to ${{ github.event.inputs.deploy_color }}
+      - name: Switch Ingress to new color
         run: |
-          kubectl patch svc client-service -n prod \
-            -p '{"spec": {"selector": {"app": "client", "color": "${{ github.event.inputs.deploy_color }}"}}}'
+          kubectl patch ingress app-ingress -n prod --type='json' -p="[
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/0/backend/service/name\", \"value\": \"posts-svc-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/1/backend/service/name\", \"value\": \"comments-svc-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/2/backend/service/name\", \"value\": \"query-svc-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/3/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" }
+          ]"
+          kubectl patch ingress client-ingress -n prod --type='json' -p="[
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/0/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/1/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/2/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" },
+            {\"op\": \"replace\", \"path\": \"/spec/rules/0/http/paths/3/backend/service/name\", \"value\": \"client-service-${{ env.COLOR }}\" }
+          ]"
 
-      - name: Cleanup opposite deployment (optional)
-        run: |
-          if [ "${{ github.event.inputs.deploy_color }}" == "blue" ]; then
-            kubectl delete deployment client-deployment-green -n prod --ignore-not-found
-          else
-            kubectl delete deployment client-deployment-blue -n prod --ignore-not-found
-          fi
+      # - name: Cleanup opposite deployment (optional)
+      #   run: |
+      #     if [ "${{ github.event.inputs.deploy_color }}" == "blue" ]; then
+      #       kubectl delete deployment client-deployment-green -n prod --ignore-not-found
+      #     else
+      #       kubectl delete deployment client-deployment-blue -n prod --ignore-not-found
+      #     fi
 
       - name: Print service and ingress info
         run: |

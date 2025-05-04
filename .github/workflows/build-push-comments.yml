@@ -3,7 +3,7 @@ name: Build and Push Comments Service
 on:
   pull_request:
     paths:
-      - 'blog/comments/**'
+      - "blog/comments/**"
   workflow_dispatch: {}
 
 jobs:
@@ -34,3 +34,9 @@ jobs:
         run: |
           docker push ${{ secrets.ECR_COMMENTS_URI }}:latest
           docker push ${{ secrets.ECR_COMMENTS_URI }}:${{ env.timestamp }}
+
+      - name: Trigger QA Deployment
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Deploy All Services to QA
+          token: ${{ secrets.GITHUB_TOKEN }}
